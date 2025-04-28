@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>10 Second Sync Timer</title>
+<title>15 Minute Sync Timer</title>
 <style>
   body {
     background-color: #000;
@@ -176,15 +176,21 @@ function playChime() {
 
 function updateTimer() {
   const now = new Date();
+  const minutes = now.getMinutes();
   const seconds = now.getSeconds();
   const milliseconds = now.getMilliseconds();
-  const minutes = now.getMinutes();
 
-  const secondsSinceLastMark = seconds % 10;
-  const secondsToNextMark = (10 - secondsSinceLastMark) % 10;
+  const nextQuarter = Math.ceil(minutes / 15) * 15;
+  const diffMinutes = (nextQuarter === 60 ? 0 : nextQuarter) - minutes;
+  const diffSeconds = 60 - seconds;
 
-  const displayMinutes = Math.floor(secondsToNextMark / 60);
-  const displaySeconds = secondsToNextMark % 60;
+  let totalSecondsLeft = diffMinutes * 60 + diffSeconds;
+  if (nextQuarter === 60 && minutes !== 0) {
+    totalSecondsLeft += 3600;
+  }
+
+  const displayMinutes = Math.floor(totalSecondsLeft / 60) % 60;
+  const displaySeconds = totalSecondsLeft % 60;
 
   timerDisplay.textContent = 
     String(displayMinutes).padStart(2, '0') + ':' + 
