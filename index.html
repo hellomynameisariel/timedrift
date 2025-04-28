@@ -11,14 +11,36 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     height: 100vh;
     margin: 0;
     font-family: Arial, sans-serif;
+    padding-top: 20px;
+  }
+  #blockStatus {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  #blockStatus h2 {
+    margin: 5px 0 5px 0;
+    font-size: 1.5em;
+  }
+  table {
+    border-collapse: collapse;
+    margin: 0 auto;
+  }
+  td {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1em;
+    border: 1px solid #555;
   }
   #timer {
     font-size: var(--timer-font-size, 8vw);
     text-align: center;
+    margin-top: 10px;
   }
   #controls {
     margin-top: 20px;
@@ -26,22 +48,6 @@
     flex-direction: column;
     align-items: center;
     gap: 10px;
-  }
-  #blockStatus {
-    margin-top: 30px;
-    text-align: center;
-  }
-  table {
-    margin-top: 10px;
-    border-collapse: collapse;
-  }
-  td {
-    width: 60px;
-    height: 60px;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 1.2em;
-    border: 1px solid #555;
   }
   button {
     background-color: #222;
@@ -61,14 +67,6 @@
 </head>
 <body>
 
-<div id="timer">00:00</div>
-<div id="controls">
-  <button id="muteButton">Mute</button>
-  <label for="sizeSlider">Clock Size</label>
-  <input type="range" id="sizeSlider" min="4" max="20" value="8">
-  <button id="testChimeButton">Test Chime</button>
-</div>
-
 <div id="blockStatus">
   <h2>Time Blocks Left This Hour</h2>
   <table>
@@ -79,6 +77,14 @@
       <td id="block00">:00</td>
     </tr>
   </table>
+</div>
+
+<div id="timer">00:00</div>
+<div id="controls">
+  <button id="muteButton">Mute</button>
+  <label for="sizeSlider">Clock Size</label>
+  <input type="range" id="sizeSlider" min="4" max="20" value="8">
+  <button id="testChimeButton">Test Chime</button>
 </div>
 
 <audio id="chimeSound" src="chime.mp3"></audio>
@@ -151,10 +157,17 @@ function updateTimer() {
     colors[i] = 'red';
   }
 
-  blocks.block15.style.backgroundColor = colors[0];
-  blocks.block30.style.backgroundColor = colors[1];
-  blocks.block45.style.backgroundColor = colors[2];
-  blocks.block00.style.backgroundColor = colors[3];
+  const textColors = {
+    yellow: '#000',
+    green: '#fff',
+    red: '#fff'
+  };
+
+  const blockElements = [blocks.block15, blocks.block30, blocks.block45, blocks.block00];
+  for (let i = 0; i < 4; i++) {
+    blockElements[i].style.backgroundColor = colors[i];
+    blockElements[i].style.color = textColors[colors[i]];
+  }
 }
 
 setInterval(updateTimer, 100);
