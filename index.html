@@ -69,8 +69,8 @@
   }
   .slider-label {
     margin-top: 10px;
-    font-size: 0.9em;
-    color: #888;
+    font-size: 1em;
+    color: #ccc;
   }
   button {
     background-color: #222;
@@ -114,6 +114,7 @@
   <div class="button-row">
     <button id="muteButton">Mute</button>
     <button id="testChimeButton">Test Chime</button>
+    <button id="popOutButton">Pop Out</button>
   </div>
   <div class="slider-bar">
     <span>-</span>
@@ -131,6 +132,7 @@ const muteButton = document.getElementById('muteButton');
 const chimeSound = document.getElementById('chimeSound');
 const sizeSlider = document.getElementById('sizeSlider');
 const testChimeButton = document.getElementById('testChimeButton');
+const popOutButton = document.getElementById('popOutButton');
 const volumeSlider = document.getElementById('volumeSlider');
 const blocks = {
   block15: document.getElementById('block15'),
@@ -154,6 +156,10 @@ testChimeButton.addEventListener('click', () => {
     chimeSound.currentTime = 0;
     chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
   }
+});
+
+popOutButton.addEventListener('click', () => {
+  window.open(window.location.href, '_blank', 'width=400,height=400,menubar=no,toolbar=no,location=no,status=no');
 });
 
 volumeSlider.addEventListener('input', () => {
