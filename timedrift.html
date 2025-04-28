@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 Second Sync Timer</title>
+<style>
+  body {
+    background-color: #000;
+    color: #ccc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  #timer {
+    font-size: var(--timer-font-size, 8vw);
+    text-align: center;
+  }
+  #controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  #blockStatus {
+    margin-top: 30px;
+    text-align: center;
+  }
+  table {
+    margin-top: 10px;
+    border-collapse: collapse;
+  }
+  td {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1.2em;
+    border: 1px solid #555;
+  }
+  button {
+    background-color: #222;
+    color: #ccc;
+    border: 1px solid #555;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #333;
+  }
+  input[type=range] {
+    width: 200px;
+  }
+</style>
+</head>
+<body>
+
+<div id="timer">00:00</div>
+<div id="controls">
+  <button id="muteButton">Mute</button>
+  <label for="sizeSlider">Clock Size</label>
+  <input type="range" id="sizeSlider" min="4" max="20" value="8">
+  <button id="testChimeButton">Test Chime</button>
+</div>
+
+<div id="blockStatus">
+  <h2>Time Blocks Left This Hour</h2>
+  <table>
+    <tr>
+      <td id="block15">:15</td>
+      <td id="block30">:30</td>
+      <td id="block45">:45</td>
+      <td id="block00">:00</td>
+    </tr>
+  </table>
+</div>
+
+<audio id="chimeSound" src="chime.mp3"></audio>
+
+<script>
+let muted = false;
+const timerDisplay = document.getElementById('timer');
+const muteButton = document.getElementById('muteButton');
+const chimeSound = document.getElementById('chimeSound');
+const sizeSlider = document.getElementById('sizeSlider');
+const testChimeButton = document.getElementById('testChimeButton');
+const blocks = {
+  block15: document.getElementById('block15'),
+  block30: document.getElementById('block30'),
+  block45: document.getElementById('block45'),
+  block00: document.getElementById('block00')
+};
+
+muteButton.addEventListener('click', () => {
+  muted = !muted;
+  muteButton.textContent = muted ? 'Unmute' : 'Mute';
+});
+
+sizeSlider.addEventListener('input', () => {
+  document.documentElement.style.setProperty('--timer-font-size', sizeSlider.value + 'vw');
+});
+
+testChimeButton.addEventListener('click', () => {
+  if (!muted) {
+    chimeSound.pause();
+    chimeSound.currentTime = 0;
+    chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
+  }
+});
+
+function playChime() {
+  if (!muted) {
+    chimeSound.pause();
+    chimeSound.currentTime = 0;
+    chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
+  }
+}
+
+function updateTimer() {
+  const now = new Date();
+  const seconds = now.getSeconds();
+  const milliseconds = now.getMilliseconds();
+  const minutes = now.getMinutes();
+
+  const secondsSinceLastMark = seconds % 10;
+  const secondsToNextMark = (10 - secondsSinceLastMark) % 10;
+
+  const displayMinutes = Math.floor(secondsToNextMark / 60);
+  const displaySeconds = secondsToNextMark % 60;
+
+  timerDisplay.textContent = 
+    String(displayMinutes).padStart(2, '0') + ':' + 
+    String(displaySeconds).padStart(2, '0');
+
+  if (displayMinutes === 0 && displaySeconds === 0 && milliseconds < 200) {
+    playChime();
+  }
+
+  // Update block colors
+  const quarter = Math.floor(minutes / 15);
+  const colors = ['yellow', 'yellow', 'yellow', 'yellow'];
+
+  colors[quarter] = 'green';
+  for (let i = 0; i < quarter; i++) {
+    colors[i] = 'red';
+  }
+
+  blocks.block15.style.backgroundColor = colors[0];
+  blocks.block30.style.backgroundColor = colors[1];
+  blocks.block45.style.backgroundColor = colors[2];
+  blocks.block00.style.backgroundColor = colors[3];
+}
+
+setInterval(updateTimer, 100);
+</script>
+
+</body>
+</html>
