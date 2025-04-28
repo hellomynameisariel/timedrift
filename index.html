@@ -15,14 +15,14 @@
     height: 100vh;
     margin: 0;
     font-family: Arial, sans-serif;
-    padding-top: 20px;
+    padding-top: 10px;
   }
   #blockStatus {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
   #blockStatus h2 {
-    margin: 5px 0 5px 0;
+    margin: 5px 0;
     font-size: 1.5em;
   }
   table {
@@ -31,30 +31,35 @@
   }
   td {
     width: 50px;
-    height: 50px;
+    height: 40px;
     text-align: center;
     vertical-align: middle;
     font-size: 1em;
     border: 1px solid #555;
+    padding: 2px;
   }
   #timer {
     font-size: var(--timer-font-size, 8vw);
     text-align: center;
-    margin-top: 10px;
+    margin-top: 5px;
   }
   #controls {
-    margin-top: 20px;
+    margin-top: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px;
+  }
+  .button-row {
+    display: flex;
     gap: 10px;
   }
   button {
     background-color: #222;
     color: #ccc;
     border: 1px solid #555;
-    padding: 10px 20px;
-    font-size: 1.2em;
+    padding: 5px 10px;
+    font-size: 1em;
     cursor: pointer;
   }
   button:hover {
@@ -81,10 +86,14 @@
 
 <div id="timer">00:00</div>
 <div id="controls">
-  <button id="muteButton">Mute</button>
+  <div class="button-row">
+    <button id="muteButton">Mute</button>
+    <button id="testChimeButton">Test Chime</button>
+  </div>
   <label for="sizeSlider">Clock Size</label>
   <input type="range" id="sizeSlider" min="4" max="20" value="8">
-  <button id="testChimeButton">Test Chime</button>
+  <label for="volumeSlider">Volume</label>
+  <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
 </div>
 
 <audio id="chimeSound" src="chime.mp3"></audio>
@@ -96,6 +105,7 @@ const muteButton = document.getElementById('muteButton');
 const chimeSound = document.getElementById('chimeSound');
 const sizeSlider = document.getElementById('sizeSlider');
 const testChimeButton = document.getElementById('testChimeButton');
+const volumeSlider = document.getElementById('volumeSlider');
 const blocks = {
   block15: document.getElementById('block15'),
   block30: document.getElementById('block30'),
@@ -118,6 +128,10 @@ testChimeButton.addEventListener('click', () => {
     chimeSound.currentTime = 0;
     chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
   }
+});
+
+volumeSlider.addEventListener('input', () => {
+  chimeSound.volume = volumeSlider.value;
 });
 
 function playChime() {
@@ -148,7 +162,6 @@ function updateTimer() {
     playChime();
   }
 
-  // Update block colors
   const quarter = Math.floor(minutes / 15);
   const colors = ['yellow', 'yellow', 'yellow', 'yellow'];
 
