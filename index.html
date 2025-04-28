@@ -25,6 +25,7 @@
     margin: 5px 0;
     font-size: 1.2em;
     font-weight: normal;
+    text-transform: none;
   }
   table {
     border-collapse: collapse;
@@ -40,7 +41,7 @@
     padding: 2px;
   }
   #timer {
-    font-size: var(--timer-font-size, 8vw);
+    font-size: var(--timer-font-size, 12vw);
     text-align: center;
     margin-top: 5px;
   }
@@ -66,6 +67,11 @@
     margin: 0 5px;
     font-size: 1.2em;
   }
+  .slider-label {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #888;
+  }
   button {
     background-color: #222;
     color: #ccc;
@@ -86,7 +92,7 @@
 <body>
 
 <div id="blockStatus">
-  <h2>Time Blocks Left This Hour</h2>
+  <h2>Time blocks left this hour:</h2>
   <table>
     <tr>
       <td id="block15">:15</td>
@@ -98,10 +104,11 @@
 </div>
 
 <div id="timer">00:00</div>
+<div class="slider-label">Resize</div>
 <div id="controls">
   <div class="slider-bar">
     <span>-</span>
-    <input type="range" id="sizeSlider" min="4" max="20" value="8">
+    <input type="range" id="sizeSlider" min="4" max="30" value="12">
     <span>+</span>
   </div>
   <div class="button-row">
