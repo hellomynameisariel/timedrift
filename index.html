@@ -5,88 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>15 Minute Sync Timer</title>
 <style>
-  body {
-    background-color: #000;
-    color: #ccc;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    padding-top: 10px;
-  }
-  #blockStatus {
-    text-align: center;
-    margin-bottom: 5px;
-  }
-  #blockStatus h2 {
-    margin: 5px 0;
-    font-size: 1.2em;
-    font-weight: normal;
-    text-transform: none;
-  }
-  table {
-    border-collapse: collapse;
-    margin: 0 auto;
-  }
-  td {
-    width: 50px;
-    height: 40px;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 1em;
-    border: 1px solid #555;
-    padding: 2px;
-  }
-  #timer {
-    font-size: var(--timer-font-size, 12vw);
-    text-align: center;
-    margin-top: 5px;
-  }
-  #controls {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-  .button-row {
-    display: flex;
-    gap: 10px;
-  }
-  .slider-bar {
-    display: flex;
-    align-items: center;
-    background-color: #333;
-    padding: 5px 10px;
-    border-radius: 8px;
-  }
-  .slider-bar span {
-    margin: 0 5px;
-    font-size: 1.2em;
-  }
-  .slider-label {
-    margin-top: 10px;
-    font-size: 1em;
-    color: #ccc;
-  }
-  button {
-    background-color: #222;
-    color: #ccc;
-    border: 1px solid #555;
-    padding: 5px 10px;
-    font-size: 1em;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #333;
-  }
-  input[type=range] {
-    width: 200px;
-    background: transparent;
-  }
+  body { background-color: #000; color: #ccc; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; font-family: Arial, sans-serif; padding-top: 10px; }
+  #blockStatus { text-align: center; margin-bottom: 5px; }
+  #blockStatus h2 { margin: 5px 0; font-size: 1.2em; font-weight: normal; text-transform: none; }
+  table { border-collapse: collapse; margin: 0 auto; }
+  td { width: 50px; height: 40px; text-align: center; vertical-align: middle; font-size: 1em; border: 1px solid #555; padding: 2px; }
+  #timer { font-size: var(--timer-font-size, 12vw); text-align: center; margin-top: 5px; }
+  #controls { margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .button-row { display: flex; gap: 10px; }
+  .slider-bar { display: flex; align-items: center; background-color: #333; padding: 5px 10px; border-radius: 8px; }
+  .slider-bar span { margin: 0 5px; font-size: 1.2em; }
+  .slider-label { margin-top: 10px; font-size: 1em; color: #ccc; }
+  button { background-color: #222; color: #ccc; border: 1px solid #555; padding: 5px 10px; font-size: 1em; cursor: pointer; }
+  button:hover { background-color: #333; }
+  input[type=range] { width: 200px; background: transparent; }
 </style>
 </head>
 <body>
@@ -141,38 +73,13 @@ const blocks = {
   block00: document.getElementById('block00')
 };
 
-muteButton.addEventListener('click', () => {
-  muted = !muted;
-  muteButton.textContent = muted ? 'Unmute' : 'Mute';
-});
+muteButton.addEventListener('click', () => { muted = !muted; muteButton.textContent = muted ? 'Unmute' : 'Mute'; });
+sizeSlider.addEventListener('input', () => { document.documentElement.style.setProperty('--timer-font-size', sizeSlider.value + 'vw'); });
+testChimeButton.addEventListener('click', () => { if (!muted) { chimeSound.pause(); chimeSound.currentTime = 0; chimeSound.play().catch(e => console.log('Chime muted or blocked.')); }});
+popOutButton.addEventListener('click', () => { window.open(window.location.href, '_blank', 'width=400,height=400,menubar=no,toolbar=no,location=no,status=no'); });
+volumeSlider.addEventListener('input', () => { chimeSound.volume = volumeSlider.value; });
 
-sizeSlider.addEventListener('input', () => {
-  document.documentElement.style.setProperty('--timer-font-size', sizeSlider.value + 'vw');
-});
-
-testChimeButton.addEventListener('click', () => {
-  if (!muted) {
-    chimeSound.pause();
-    chimeSound.currentTime = 0;
-    chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
-  }
-});
-
-popOutButton.addEventListener('click', () => {
-  window.open(window.location.href, '_blank', 'width=400,height=400,menubar=no,toolbar=no,location=no,status=no');
-});
-
-volumeSlider.addEventListener('input', () => {
-  chimeSound.volume = volumeSlider.value;
-});
-
-function playChime() {
-  if (!muted) {
-    chimeSound.pause();
-    chimeSound.currentTime = 0;
-    chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
-  }
-}
+function playChime() { if (!muted) { chimeSound.pause(); chimeSound.currentTime = 0; chimeSound.play().catch(e => console.log('Chime muted or blocked.')); }}
 
 function updateTimer() {
   const now = new Date();
@@ -180,21 +87,12 @@ function updateTimer() {
   const seconds = now.getSeconds();
   const milliseconds = now.getMilliseconds();
 
-  const nextQuarter = Math.ceil(minutes / 15) * 15;
-  const diffMinutes = (nextQuarter === 60 ? 0 : nextQuarter) - minutes;
-  const diffSeconds = 60 - seconds;
+  const totalSecondsPastHour = minutes * 60 + seconds;
+  const nextBlockSeconds = 900 - (totalSecondsPastHour % 900);
+  const displayMinutes = Math.floor(nextBlockSeconds / 60);
+  const displaySeconds = nextBlockSeconds % 60;
 
-  let totalSecondsLeft = diffMinutes * 60 + diffSeconds;
-  if (nextQuarter === 60 && minutes !== 0) {
-    totalSecondsLeft += 3600;
-  }
-
-  const displayMinutes = Math.floor(totalSecondsLeft / 60) % 60;
-  const displaySeconds = totalSecondsLeft % 60;
-
-  timerDisplay.textContent = 
-    String(displayMinutes).padStart(2, '0') + ':' + 
-    String(displaySeconds).padStart(2, '0');
+  timerDisplay.textContent = String(displayMinutes).padStart(2, '0') + ':' + String(displaySeconds).padStart(2, '0');
 
   if (displayMinutes === 0 && displaySeconds === 0 && milliseconds < 200) {
     playChime();
@@ -202,18 +100,10 @@ function updateTimer() {
 
   const quarter = Math.floor(minutes / 15);
   const colors = ['yellow', 'yellow', 'yellow', 'yellow'];
-
   colors[quarter] = 'green';
-  for (let i = 0; i < quarter; i++) {
-    colors[i] = 'red';
-  }
+  for (let i = 0; i < quarter; i++) { colors[i] = 'red'; }
 
-  const textColors = {
-    yellow: '#000',
-    green: '#fff',
-    red: '#fff'
-  };
-
+  const textColors = { yellow: '#000', green: '#fff', red: '#fff' };
   const blockElements = [blocks.block15, blocks.block30, blocks.block45, blocks.block00];
   for (let i = 0; i < 4; i++) {
     blockElements[i].style.backgroundColor = colors[i];
