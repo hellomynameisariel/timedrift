@@ -13,8 +13,11 @@ This project reflects my approach to solving workflow blockers with lightweight,
 - Auto-reset for continuous use
 - No installs or configuration needed
 
+### Preview
+![preview](preview.png)
+
 ### Live Site
-[https://hellomynameisariel.github.io/timedrift](https://yourusername.github.io/timedrift)
+[Try TimeDrift here!](https://hellomynameisariel.github.io/timedrift)
 
 ### Stack
 - HTML
