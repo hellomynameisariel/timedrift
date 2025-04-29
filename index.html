@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TimeDrift: 15 Minute Sync Timer</title>
+<title>🎅🏻 TimeDrift: 15 Minute Sync Timer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎅🏻</text></svg>">
 <style>
   body { background-color: #000; color: #ccc; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; font-family: Arial, sans-serif; padding-top: 10px; }
   #blockStatus { text-align: center; margin-bottom: 5px; }
@@ -86,35 +87,67 @@ const blocks = {
   block00: document.getElementById('block00')
 };
 
-muteButton.addEventListener('click', () => { muted = !muted; muteButton.textContent = muted ? 'Unmute' : 'Mute'; });
-sizeSlider.addEventListener('input', () => { document.documentElement.style.setProperty('--timer-font-size', sizeSlider.value + 'vw'); });
-testChimeButton.addEventListener('click', () => { if (!muted) { chimeSound.pause(); chimeSound.currentTime = 0; chimeSound.play().catch(e => console.log('Chime muted or blocked.')); }});
-popOutButton.addEventListener('click', () => { window.open(window.location.href, '_blank', 'width=400,height=400,menubar=no,toolbar=no,location=no,status=no'); });
-volumeSlider.addEventListener('input', () => { chimeSound.volume = volumeSlider.value; });
+muteButton.addEventListener('click', () => {
+  muted = !muted;
+  muteButton.textContent = muted ? 'Unmute' : 'Mute';
+});
 
-function playChime() { if (!muted) { chimeSound.pause(); chimeSound.currentTime = 0; chimeSound.play().catch(e => console.log('Chime muted or blocked.')); }}
+sizeSlider.addEventListener('input', () => {
+  document.documentElement.style.setProperty('--timer-font-size', sizeSlider.value + 'vw');
+});
+
+testChimeButton.addEventListener('click', () => {
+  if (!muted) {
+    chimeSound.pause();
+    chimeSound.currentTime = 0;
+    chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
+  }
+});
+
+popOutButton.addEventListener('click', () => {
+  window.open(window.location.href, '_blank', 'width=400,height=400,menubar=no,toolbar=no,location=no,status=no');
+});
+
+volumeSlider.addEventListener('input', () => {
+  chimeSound.volume = volumeSlider.value;
+});
+
+function playChime() {
+  if (!muted) {
+    chimeSound.pause();
+    chimeSound.currentTime = 0;
+    chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
+  }
+}
+
+let lastPlayedMinute = null;
 
 function updateTimer() {
   const now = new Date();
   const minutes = now.getMinutes();
   const seconds = now.getSeconds();
-  const milliseconds = now.getMilliseconds();
 
   const totalSecondsPastHour = minutes * 60 + seconds;
-  const nextBlockSeconds = 900 - (totalSecondsPastHour % 900);
-  const displayMinutes = Math.floor(nextBlockSeconds / 60);
-  const displaySeconds = nextBlockSeconds % 60;
+  const secondsUntilNextBlock = 900 - (totalSecondsPastHour % 900);
+  const displayMinutes = Math.floor(secondsUntilNextBlock / 60);
+  const displaySeconds = secondsUntilNextBlock % 60;
 
-  timerDisplay.textContent = String(displayMinutes).padStart(2, '0') + ':' + String(displaySeconds).padStart(2, '0');
+  const timeText = String(displayMinutes).padStart(2, '0') + ':' + String(displaySeconds).padStart(2, '0');
+  timerDisplay.textContent = timeText;
+  document.title = `🎅🏻 ${timeText} TimeDrift`;
 
-  if (displayMinutes === 0 && displaySeconds === 0 && milliseconds < 200) {
+  // Play chime exactly when a block hits
+  if ((totalSecondsPastHour % 900) === 0 && seconds === 0 && lastPlayedMinute !== minutes) {
     playChime();
+    lastPlayedMinute = minutes;
   }
 
   const quarter = Math.floor(minutes / 15);
   const colors = ['yellow', 'yellow', 'yellow', 'yellow'];
   colors[quarter] = 'green';
-  for (let i = 0; i < quarter; i++) { colors[i] = 'red'; }
+  for (let i = 0; i < quarter; i++) {
+    colors[i] = 'red';
+  }
 
   const textColors = { yellow: '#000', green: '#fff', red: '#fff' };
   const blockElements = [blocks.block15, blocks.block30, blocks.block45, blocks.block00];
@@ -124,8 +157,9 @@ function updateTimer() {
   }
 }
 
-setInterval(updateTimer, 100);
+setInterval(updateTimer, 1000);
 </script>
 
+  
 </body>
 </html>
