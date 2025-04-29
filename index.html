@@ -1,35 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TimeDrift: 15 Minute Sync Timer</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎅🏻</text></svg>">
-<style>
-  body { background-color: #000; color: #ccc; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; font-family: Arial, sans-serif; padding-top: 10px; }
-  #blockStatus { text-align: center; margin-bottom: 5px; }
-  #blockStatus h2 { margin: 5px 0; font-size: 1.2em; font-weight: normal; text-transform: none; }
-  table { border-collapse: collapse; margin: 0 auto; }
-  td { width: 50px; height: 40px; text-align: center; vertical-align: middle; font-size: 1em; border: 1px solid #555; padding: 2px; }
-  #timer { font-size: var(--timer-font-size, 12vw); text-align: center; margin-top: 5px; }
-  #controls { margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-  .button-row { display: flex; gap: 10px; }
-  .slider-bar { display: flex; align-items: center; background-color: #333; padding: 5px 10px; border-radius: 8px; }
-  .slider-bar span { margin: 0 5px; font-size: 1.2em; }
-  .slider-label { margin-top: 10px; font-size: 1em; color: #ccc; }
-  button { background-color: #222; color: #ccc; border: 1px solid #555; padding: 5px 10px; font-size: 1em; cursor: pointer; }
-  button:hover { background-color: #333; }
-  input[type=range] { width: 200px; background: transparent; }
-  .footer-link {
-    font-size: 0.7em;
-    color: #888;
-    margin-top: 12px;
-  }
-  .footer-link a {
-    color: #888;
-    text-decoration: none;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎅🏻 TimeDrift: 15 Minute Sync Timer</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎅🏻</text></svg>">
+  <style>
+    body {
+      background-color: #000;
+      color: #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      padding-top: 10px;
+    }
+    #blockStatus {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    #blockStatus h2 {
+      margin: 5px 0;
+      font-size: 1.2em;
+      font-weight: normal;
+      text-transform: none;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 0 auto;
+    }
+    td {
+      width: 50px;
+      height: 40px;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 1em;
+      border: 1px solid #555;
+      padding: 2px;
+    }
+    #timer {
+      font-size: var(--timer-font-size, 12vw);
+      text-align: center;
+      margin-top: 5px;
+    }
+    #controls {
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .button-row {
+      display: flex;
+      gap: 10px;
+    }
+    .slider-bar {
+      display: flex;
+      align-items: center;
+      background-color: #333;
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+    .slider-bar span {
+      margin: 0 5px;
+      font-size: 1.2em;
+    }
+    .slider-label {
+      margin-top: 10px;
+      font-size: 1em;
+      color: #ccc;
+    }
+    button {
+      background-color: #222;
+      color: #ccc;
+      border: 1px solid #555;
+      padding: 5px 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #333;
+    }
+    input[type=range] {
+      width: 200px;
+      background: transparent;
+    }
+    .footer-link {
+      font-size: 0.7em;
+      color: #888;
+      margin-top: 12px;
+    }
+    .footer-link a {
+      color: #888;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
 
@@ -87,6 +155,8 @@ const blocks = {
   block00: document.getElementById('block00')
 };
 
+let lastChimeBlock = null;
+
 muteButton.addEventListener('click', () => {
   muted = !muted;
   muteButton.textContent = muted ? 'Unmute' : 'Mute';
@@ -120,11 +190,10 @@ function playChime() {
   }
 }
 
-// Find the real next block time (next :15/:30/:45/:00)
 function getNextBlockTime() {
   const now = new Date();
   const minutes = now.getMinutes();
-  const nextBlock = Math.ceil((minutes + 0.01) / 15) * 15; // tiny 0.01 to fix exact edge
+  const nextBlock = Math.ceil((minutes + 0.01) / 15) * 15;
   const next = new Date(now);
   next.setMinutes(nextBlock % 60);
   next.setSeconds(0);
@@ -140,7 +209,7 @@ let nextBlockTime = getNextBlockTime();
 function updateTimer() {
   const now = new Date();
   let msLeft = nextBlockTime - now;
-  
+
   if (msLeft <= 0) {
     playChime();
     nextBlockTime = getNextBlockTime();
@@ -155,8 +224,6 @@ function updateTimer() {
   timerDisplay.textContent = timeText;
   document.title = `🎅🏻 ${timeText} TimeDrift`;
 
-  // Block coloring
-  const blockElements = [blocks.block15, blocks.block30, blocks.block45, blocks.block00];
   const currentMinutes = now.getMinutes();
   const quarter = Math.floor(currentMinutes / 15);
   const colors = ['yellow', 'yellow', 'yellow', 'yellow'];
@@ -164,15 +231,16 @@ function updateTimer() {
   for (let i = 0; i < quarter; i++) colors[i] = 'red';
 
   const textColors = { yellow: '#000', green: '#fff', red: '#fff' };
+  const blockElements = [blocks.block15, blocks.block30, blocks.block45, blocks.block00];
   for (let i = 0; i < 4; i++) {
     blockElements[i].style.backgroundColor = colors[i];
     blockElements[i].style.color = textColors[colors[i]];
   }
 
-  requestAnimationFrame(updateTimer);
+  const delay = 1000 - now.getMilliseconds();
+  setTimeout(updateTimer, delay);
 }
 
-// Snap back after tab hidden
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
     nextBlockTime = getNextBlockTime();
@@ -180,11 +248,8 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Start
 updateTimer();
 </script>
 
-
-  
 </body>
 </html>
