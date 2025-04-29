@@ -87,6 +87,8 @@ const blocks = {
   block00: document.getElementById('block00')
 };
 
+let lastChimeTime = null;
+
 muteButton.addEventListener('click', () => {
   muted = !muted;
   muteButton.textContent = muted ? 'Unmute' : 'Mute';
@@ -100,7 +102,7 @@ testChimeButton.addEventListener('click', () => {
   if (!muted) {
     chimeSound.pause();
     chimeSound.currentTime = 0;
-    chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
+    chimeSound.play().catch(() => {});
   }
 });
 
@@ -116,27 +118,24 @@ function playChime() {
   if (!muted) {
     chimeSound.pause();
     chimeSound.currentTime = 0;
-    chimeSound.play().catch(e => console.log('Chime muted or blocked.'));
+    chimeSound.play().catch(() => {});
   }
 }
 
-let lastChimeTime = null;
-
-function updateTimer() {
+function updateDisplay() {
   const now = new Date();
   const minutes = now.getMinutes();
   const seconds = now.getSeconds();
-
   const totalSecondsPastHour = minutes * 60 + seconds;
   const secondsUntilNextBlock = 900 - (totalSecondsPastHour % 900);
   const displayMinutes = Math.floor(secondsUntilNextBlock / 60);
   const displaySeconds = secondsUntilNextBlock % 60;
 
-  const timeText = String(displayMinutes).padStart(2, '0') + ':' + String(displaySeconds).padStart(2, '0');
+  const timeText = `${String(displayMinutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
   timerDisplay.textContent = timeText;
   document.title = `🎅🏻 ${timeText} TimeDrift`;
 
-  // Play chime at the exact moment a block begins
+  // Chime if hitting new block
   const currentBlockStart = totalSecondsPastHour - (totalSecondsPastHour % 900);
   if (totalSecondsPastHour % 900 === 0 && lastChimeTime !== currentBlockStart) {
     playChime();
@@ -147,9 +146,7 @@ function updateTimer() {
   const quarter = Math.floor(minutes / 15);
   const colors = ['yellow', 'yellow', 'yellow', 'yellow'];
   colors[quarter] = 'green';
-  for (let i = 0; i < quarter; i++) {
-    colors[i] = 'red';
-  }
+  for (let i = 0; i < quarter; i++) colors[i] = 'red';
 
   const textColors = { yellow: '#000', green: '#fff', red: '#fff' };
   const blockElements = [blocks.block15, blocks.block30, blocks.block45, blocks.block00];
@@ -157,17 +154,20 @@ function updateTimer() {
     blockElements[i].style.backgroundColor = colors[i];
     blockElements[i].style.color = textColors[colors[i]];
   }
-
-  // Schedule the next tick to sync to the real second
-  const delay = 1000 - now.getMilliseconds();
-  setTimeout(updateTimer, delay);
 }
 
-// Start the timer loop
-updateTimer();
+function animationLoop() {
+  updateDisplay();
+  requestAnimationFrame(animationLoop);
+}
+
+// Also update when tab becomes visible again
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) updateDisplay();
+});
+
+requestAnimationFrame(animationLoop);
 </script>
-
-
   
 </body>
 </html>
