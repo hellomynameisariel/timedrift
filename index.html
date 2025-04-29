@@ -120,7 +120,7 @@ function playChime() {
   }
 }
 
-let lastPlayedMinute = null;
+let lastChimeTime = null;
 
 function updateTimer() {
   const now = new Date();
@@ -136,12 +136,14 @@ function updateTimer() {
   timerDisplay.textContent = timeText;
   document.title = `🎅🏻 ${timeText} TimeDrift`;
 
-  // Play chime exactly when a block hits
-  if ((totalSecondsPastHour % 900) === 0 && seconds === 0 && lastPlayedMinute !== minutes) {
+  // Play chime at the exact moment a block begins
+  const currentBlockStart = totalSecondsPastHour - (totalSecondsPastHour % 900);
+  if (totalSecondsPastHour % 900 === 0 && lastChimeTime !== currentBlockStart) {
     playChime();
-    lastPlayedMinute = minutes;
+    lastChimeTime = currentBlockStart;
   }
 
+  // Update block colors
   const quarter = Math.floor(minutes / 15);
   const colors = ['yellow', 'yellow', 'yellow', 'yellow'];
   colors[quarter] = 'green';
@@ -155,10 +157,16 @@ function updateTimer() {
     blockElements[i].style.backgroundColor = colors[i];
     blockElements[i].style.color = textColors[colors[i]];
   }
+
+  // Schedule the next tick to sync to the real second
+  const delay = 1000 - now.getMilliseconds();
+  setTimeout(updateTimer, delay);
 }
 
-setInterval(updateTimer, 1000);
+// Start the timer loop
+updateTimer();
 </script>
+
 
   
 </body>
